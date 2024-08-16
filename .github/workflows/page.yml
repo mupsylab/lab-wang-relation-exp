@@ -3,7 +3,7 @@ name: Page
 on:
   push:
     branches:
-    - 'gh-page-build'
+    - 'master'
   workflow_dispatch:
 
 jobs:
