@@ -9,9 +9,13 @@ import { initJsPsych } from 'jspsych';
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import jsPsychCallFunction from "@jspsych/plugin-call-function";
 
+import endExp from "./endExp.vue";
 const jsPsych = initJsPsych({
     display_element: "exp",
     on_finish() {
+        const dom = document.querySelector("#exp") as Element;
+        dom.innerHTML = "";
+        render(h(endExp), dom);
         console.log(jsPsych.data.get().csv());
     }
 });
@@ -55,7 +59,7 @@ timeline.push({
         on_finish(data: any) {
             const { name_resp, name_type } = data;
             jsPsych.data.write(Object.assign({}, {
-                save: true,
+                save: true, exper_type: "getName",
                 name_type, name_resp
             }));
         }
@@ -74,12 +78,6 @@ timeline.push({
         names = parseNamesFromResp();
     }
 });
-
-// 模拟用，毕竟谁会真的填。
-// let names: string[] = [];
-// for (let i = 0; i < 60; i++) {
-//     names.push(`aaa${i}`);
-// }
 
 // 判断哪些人是认识的
 import nameKnow from "./components/nameKnow.vue";
@@ -129,13 +127,50 @@ timeline.push({
         on_finish(data: any) {
             const { pair_names, pair_resp } = data;
             jsPsych.data.write(Object.assign({}, {
-                save: true,
+                save: true, exper_type: "pairName",
                 pair_names, pair_resp
             }));
         }
     }],
     loop_function() {
         return name_index.length > 0;
+    }
+});
+
+// 你们什么关系、上次面对面互动是什么时候、上一次网上互动是什么时候、
+// 性别、年龄、种族、喜欢、好事、坏事找ta的可能性、是否共同生活
+
+// 给人填写个人信息
+import infoName from "./components/infoName.vue";
+let progress_index = 0;
+timeline.push({
+    type: jsPsychCallFunction,
+    func() {
+        progress_index = 0
+    }
+}, {
+    timeline: [{
+        type: jsPsychHtmlKeyboardResponse,
+        stimulus: '<div id="box"></div>',
+        choices: ["NO_KEYS"],
+        on_load() {
+            render(h(infoName, {
+                name: names[progress_index],
+                desc: "下面需要您回答与此人相关的一些问题",
+                onEndTrial(d) {
+                    jsPsych.finishTrial(Object.assign({}, {
+                        save: true,
+                        exper_type: "infoName",
+                    }, d));
+                }
+            }), document.querySelector("#box") as Element);
+        },
+        on_finish() {
+            progress_index += 1;
+        }
+    }],
+    loop_function() {
+        return progress_index < names.length
     }
 });
 

@@ -28,7 +28,7 @@ const changeResp = (i: number) => {
                 <div class="right">{{ item[1] }}</div>
             </div>
         </div>
-        <div>{{ leave }}</div>
+        <div>当前还剩下:{{ leave }}</div>
         <div class="button-box">
             <div class="submit" @click="emits('endTrials', resp);">提交</div>
         </div>
