@@ -16,7 +16,7 @@ const jsPsych = initJsPsych({
         const dom = document.querySelector("#exp") as Element;
         dom.innerHTML = "";
         render(h(endExp), dom);
-        console.log(jsPsych.data.get().csv());
+        jsPsych.data.get().filter({ save: true }).localSave("csv", `${new Date().getTime()}.csv`);
     }
 });
 
@@ -157,10 +157,12 @@ timeline.push({
             render(h(infoName, {
                 name: names[progress_index],
                 desc: "下面需要您回答与此人相关的一些问题",
+                leave: names.length - progress_index,
                 onEndTrial(d) {
                     jsPsych.finishTrial(Object.assign({}, {
                         save: true,
                         exper_type: "infoName",
+                        name: names[progress_index]
                     }, d));
                 }
             }), document.querySelector("#box") as Element);

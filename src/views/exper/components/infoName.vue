@@ -54,6 +54,7 @@
             </div>
             <input type="submit" hidden>
         </form>
+        <div>当前还剩余: {{ props.leave }}</div>
         <div class="button-box">
             <div class="submit" @click="submit">提交</div>
         </div>
@@ -67,6 +68,7 @@ const emits = defineEmits(["endTrial"]);
 const props = defineProps<{
     name: string,
     desc: string,
+    leave: number
 }>();
 
 const info: { [key: string]: Ref<string | number> } = {
