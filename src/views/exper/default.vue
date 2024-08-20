@@ -21,6 +21,14 @@ const jsPsych = initJsPsych({
 });
 
 const timeline: object[] = [];
+import insturctionAll from "./components/insturctionAll.vue";
+timeline.push({
+    type: jsPsychHtmlKeyboardResponse,
+    stimulus: "<div id='box'></div>",
+    on_load() {
+        render(h(insturctionAll), document.querySelector("#box") as Element);
+    }
+});
 
 // 获取名字
 // 不同名字之间进行匹配，看看哪些是认识的
