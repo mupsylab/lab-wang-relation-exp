@@ -73,17 +73,22 @@ const formSubmit = (e: Event) => {
     width: 240px;
     height: 450px;
     margin: 20px auto 20px auto;
-    padding: 0 10px 0 0;
+    padding: 0 5px 0 0;
     text-align: left;
     overflow: hidden auto;
 }
 
 .q-box {
+    width: 200px;
+    background-color: var(--dashboard-dividing);
     margin: 10px 0;
+    box-sizing: content-box;
+    padding: 10px 10px;
+    border-radius: 10px;
 }
 
 .q-box .text .title {
-    font-size: 16px;
+    font-size: 18px;
 }
 
 .q-box .text .desc {

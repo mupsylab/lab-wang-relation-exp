@@ -4,7 +4,7 @@
             <div class="content">欢迎参加本次实验！接下来你将会回答有关你的社交网络的问题。</div>
             <div class="head1">指导语</div>
             <div class="content">在游戏过程中，你需要输入那些你认识并与之互动的家人、朋友、熟悉的人的名字。</div>
-            <div class="content">你的每段关系都会在你的宇宙中拥有属于自己的部分，为了让你创造最完整的宇宙，你将需要把人们分成6个不同的组：</div>
+            <div class="content">你的每段关系都会在你的宇宙中拥有属于自己的部分，为了让你创造最完整的宇宙，你将需要把人们分成6个不同的组（<strong>同一个人可以出现在不同组中</strong>）：</div>
             <ul class="list1">
                 <li>家人</li>
                 <li>朋友</li>
