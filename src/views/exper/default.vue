@@ -25,8 +25,13 @@ import insturctionAll from "./components/insturctionAll.vue";
 timeline.push({
     type: jsPsychHtmlKeyboardResponse,
     stimulus: "<div id='box'></div>",
+    choices: ["NO_KEYS"],
     on_load() {
-        render(h(insturctionAll), document.querySelector("#box") as Element);
+        render(h(insturctionAll, {
+            onEndTrials() {
+                jsPsych.finishTrial();
+            }
+        }), document.querySelector("#box") as Element);
     }
 });
 
