@@ -9,14 +9,22 @@ import { initJsPsych } from 'jspsych';
 import jsPsychHtmlKeyboardResponse from "@jspsych/plugin-html-keyboard-response";
 import jsPsychCallFunction from "@jspsych/plugin-call-function";
 
+import Naodao from "../../utils/naodao";
+const nd = new Naodao();
+nd.getData = () => {
+    return jsPsych.data.get().filter({ save: true }).csv();
+};
+
 import endExp from "./endExp.vue";
 const jsPsych = initJsPsych({
     display_element: "exp",
     on_finish() {
+        nd.save();
+
         const dom = document.querySelector("#exp") as Element;
         dom.innerHTML = "";
         render(h(endExp), dom);
-        jsPsych.data.get().filter({ save: true }).localSave("csv", `${new Date().getTime()}.csv`);
+        // jsPsych.data.get().filter({ save: true }).localSave("csv", `${new Date().getTime()}.csv`);
     }
 });
 
@@ -43,31 +51,75 @@ const parseNamesFromResp = () => {
     const data = jsPsych.data.get().filter({ save: true }).values();
 
     const names: Set<string> = new Set();
-    data.forEach(element => {
-        const { name_resp } = element;
-        name_resp.forEach((v: string) => {
-            names.add(v);
-        });
-    });
+    const record_name: string[] = [];
+    for (let i = data.length - 1; i >= 0; i--) {
+        const { name_type, name_resp } = data[i];
+        if (record_name.indexOf(name_type) >= 0) {
+            continue
+        } else {
+            record_name.push(name_type);
+            name_resp.forEach((v: string) => {
+                names.add(v);
+            });
+        }
+    }
     return Array.from(names);
 };
+const getCurrTypeResp: (t: string) => string[] = (t: string) => {
+    const data = jsPsych.data.get().filter({ save: true }).values();
+    for (let i = data.length - 1; i >= 0; i--) {
+        const { name_type, name_resp } = data[i];
+        if(name_type == t) {
+            return name_resp;
+        }
+    }
+    return [];
+}
 let names: string[] = [];
+let category_index = 0;
+const categories = [
+    { inputTitle: "家人" },
+    { inputTitle: "好朋友" },
+    { inputTitle: "使用手机通话交流" },
+    { inputTitle: "使用手机打字交流" },
+    { inputTitle: "过去一周面对面交流" },
+    { inputTitle: "过去一周用社交媒体互动" },
+];
 timeline.push({
+    type: jsPsychCallFunction,
+    func() {
+        category_index = 0;
+    }
+}, {
     timeline: [{
         type: jsPsychHtmlKeyboardResponse,
         choices: ["NO_KEYS"],
         stimulus: '<div id="box"></div>',
         on_load() {
-            const inputType: string = jsPsych.timelineVariable("inputTitle", true);
+            const inputType: string = categories[category_index].inputTitle;
+            console.log(getCurrTypeResp(inputType));
             render(h(inputName, {
                 inputType: inputType,
+                showBackButton: category_index > 0,
+                recordInputs: getCurrTypeResp(inputType),
                 onEndTrial(result: string[]) {
                     jsPsych.finishTrial({
                         name_resp: result,
                         name_type: inputType
-                    })
+                    });
+                },
+                onBack(result: string[]) {
+                    category_index -= 2;
+                    if(category_index <= 0) {
+                        category_index = 0;
+                    }
+                    jsPsych.finishTrial({
+                        name_resp: result,
+                        name_type: inputType
+                    });
                 }
-            }), document.querySelector("#box") as Element)
+            }), document.querySelector("#box") as Element);
+            category_index += 1;
         },
         on_finish(data: any) {
             const { name_resp, name_type } = data;
@@ -77,14 +129,12 @@ timeline.push({
             }));
         }
     }],
-    timeline_variables: [
-        { inputTitle: "家人" },
-        { inputTitle: "好朋友" },
-        { inputTitle: "使用手机通话交流" },
-        { inputTitle: "使用手机打字交流" },
-        { inputTitle: "过去一周面对面交流" },
-        { inputTitle: "过去一周用社交媒体互动" },
-    ]
+    loop_function() {
+        if(category_index >= categories.length) {
+            return false;
+        }
+        return true;
+    }
 }, {
     type: jsPsychCallFunction,
     func() {
@@ -97,7 +147,7 @@ import nameKnow from "./components/nameKnow.vue";
 let name_index: Array<number[]> = [];
 const getNamesFromIndex = (num: number) => {
     const result = [];
-    if(num > name_index.length) num = name_index.length;
+    if (num > name_index.length) num = name_index.length;
     for (let i = 0; i < num; i++) {
         const random_index = Math.floor(Math.random() * name_index.length);
         const [i1, i2] = name_index.splice(random_index, 1)[0];
@@ -109,7 +159,7 @@ timeline.push({
     type: jsPsychCallFunction,
     func() {
         const len = names.length;
-        if(len < 5) {
+        if (len < 5) {
             alert("填写人数小于5，无法完成实验~");
             location.reload();
         }
