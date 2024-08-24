@@ -1,0 +1,1 @@
+import{a as r,b as o,t as a,u as s,y as n,o as c}from"./vendor-CVIdNdG0.js";const i=r({__name:"error",setup(u){const e=n().params.pathMatch[0],t={400:"不支持的浏览器类型",404:"未知页面"};return(_,l)=>(c(),o("div",null,a(t[s(e)]),1))}});export{i as default};
